@@ -2,86 +2,71 @@
 #define _GAME_H_
 
 #include <vector>
-#include "Player.h"
+#include "Entity.h"
+#include <string>
+
+#define BOARD_SIZE 10
+
+using namespace std;
 
 // you may change this enum as you need
-enum class SquareType { Wall, Dots, Pacman, Treasure, Enemies, Empty, PowerfulPacman, Trap, EnemySpecialTreasure };
+enum class SquareType { Wall, Dots, Treasure, Empty };
+enum class Direction { Up, Down, Left, Right };
 
-// TODO: implement
-std::string SquareTypeStringify(SquareType sq);
+string getSquareTypeString(SquareType s); //gets the string of the SquareType s
+
+class Square {
+public:
+	Square(SquareType type); //initializes a square
+	Entity* getOccupant(); //gets whoever is currently on the square (player/enemy)
+	SquareType getType(); //gets the type of the square
+	void changeType(SquareType newType); //change the type of the square (ex. Dots -> Empty)
+	void changeOccupant(Entity* entity); //change the occupant of the square
+private:
+	Entity* occupant;
+	SquareType type; 
+};
 
 class Board {
 public:
-	// // TODO: implement
-	// Board();
+	Board(); //creates a board by parsing a file
 
-	// // already implemented in line
-	// int get_rows() const {return 10; }  // you should be able to change the size of your
-	// int get_cols() const {return 10; }  // board by changing these numbers and the numbers in the arr_ field
+	SquareType getSquareType(Position pos); //returns the type of the square at a position
+	void setSquareType(Position pos, SquareType type); //change the type of the square at a position
+	Entity* getSquareOccupant(Position pos); //returns the occupant of the entity at a position
 
-	// // TODO: you MUST implement the following functions
-	// SquareType get_square_value(Position pos) const;
+	vector<Direction> getValidMoves(Position pos); //get the valid moves from a position
+	string getValidMovesString(Position pos); //get the valid moves but as a string
 
-	// // set the value of a square to the given SquareType
-	// void SetSquareValue(Position pos, SquareType value);
+	Square move(Entity* entity, Position pos); //move entity to pos, return the new square the entity is on. All moves MUST go through this function
 
-	// // get the possible Positions that a Player/Enemy could move to
-	// // (not off the board or into a wall)
-	// std::vector<Position> GetMoves(Player *p);
-
-	// // Move a player to a new position on the board. Return
-	// // true if they moved successfully, false otherwise.
-	// bool MovePlayer(Player *p, Position pos, std::vector<Player*> enemylist);
-
-    // // Move an enemy to a new position on the board. Return
-	// // true if they moved successfully, false otherwise.
-    // bool MoveEnemy(Player *p, Position pos);
-
-	// // You probably want to implement this
-	// friend std::ostream& operator<<(std::ostream& os, const Board &b);
+	void printBoard(); //prints the entire board
 
 private:
-	SquareType arr_[10][10];
-	int rows_; // might be convenient but not necessary
-	int cols_;
-	// you may add more fields, as needed
-};  // class Board
+	Square arr[BOARD_SIZE][BOARD_SIZE];
+};
 
 class Game {
 public:
-	// TODO: implement these functions
-	// Game(); // constructor
+	Game(); //creates a new game with 5 enemies
+	Game(const int enemyCount); // creates a new game with a specified number of enemies
 
-	// // initialize a new game, given one human player and
-	// // a number of enemies to generate
-	// void NewGame(Player *human,std::vector<Player*> enemylist, const int enemies);
+	Board* getBoard(); //returns the board object, useful for Entity constructors
 
-	// // have the given Player take their turn
-	// void TakeTurn(Player *p,std::vector<Player*> enemylist);
+	Player* getPlayer(); //returns the player, useful for enemies
 
-	// //have the enemy take turn
-	// void TakeTurnEnemy(Player *p);
+	void takeTurn(); //turn logic, performs player move and then performs enemy moves
 
-	// bool IsGameOver(Player *p);
+	void killEnemy(Enemy* enemy); //delete enemy, remove its address from enemies array
 
-	// // return true if all pellets have been collected
-	// bool CheckifdotsOver();
+	void gameOver(bool win); //ends the game, displays win or loss screen based on bool
 
-	// // You probably want to implement these functions as well
-	// // string info about the game's conditions after it is over
-	// std::string GenerateReport(Player *p);
-
-	// friend std::ostream& operator<<(std::ostream& os, const Game &m);
-
+	~Game(); //clean up memory
 private:
-	Board *board_;
-	std::vector<Player *> players_;
-	int turn_count_;
-    int dots_count_;
-    bool GameOver;
-
-	// you may add more fields, as needed
-
-};  // class Game
+	Board* board;
+	Player* player;
+	vector<Enemy*> enemies;
+	int turnCount;
+};
 
 #endif  // _GAME_H_
