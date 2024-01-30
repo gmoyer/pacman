@@ -7,7 +7,7 @@ using namespace std;
 
 int main() {
     //srand (time(NULL));
-    Board board = Board();
+    Board board = Board("board.txt");
 
     cout << "populating board" << endl;
     board.populateBoard(5);

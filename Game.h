@@ -3,7 +3,7 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-
+#include "Entity.h"
 #include <vector>
 #include <string>
 
@@ -25,9 +25,9 @@ SquareType getSquareTypeFromChar(char c); //get the square time from a character
 
 class Square {
 private:
+	Position pos;
 	SquareType type; 
 	Entity* occupant;
-	Position pos;
 public:
 	Square(Position pos, SquareType type_); //initializes a square
 	Entity* getOccupant() const; //gets whoever is currently on the square (player/enemy)
