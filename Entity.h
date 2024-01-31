@@ -7,7 +7,7 @@
 using namespace std;
 
 enum class EntityType { Player, Enemy, None };
-enum class Direction { Up, Down, Left, Right };
+enum class Direction { Up, Down, Left, Right, None };
 
 struct Position {
 	int row;

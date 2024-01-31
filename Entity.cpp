@@ -78,8 +78,9 @@ Enemy::Enemy(Position pos_) {
 
 
 Position Enemy::takeTurn(vector<Direction> validMoves) {
-    Direction chosenDirection = validMoves[rand() % validMoves.size()];
-
+    Direction chosenDirection = Direction::None;
+    if (validMoves.size() > 0)
+        chosenDirection = validMoves[rand() % validMoves.size()];
     switch (chosenDirection) {
         case Direction::Up:
             return Position{pos.row-1, pos.col};
