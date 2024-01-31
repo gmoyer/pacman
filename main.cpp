@@ -9,5 +9,9 @@ int main() {
     //srand (time(NULL));
     Game* game = new Game();
 
-    game->startGame();
+    try{ 
+        game->startGame();
+    } catch (const std::exception& e) {
+        cout << e.what() << endl;
+    }
 }

@@ -55,7 +55,7 @@ public:
 	void parseBoard(); //loads the board into array
 	vector<Enemy*> populateBoard(int enemyCount); //populates the board with enemies and the same number of treasures. Returns the list of enemies
 
-	vector<Direction> getValidMoves(Position pos); //get the valid moves from a position. Moving onto the player counts as a valid move, but not onto enemies
+	vector<Direction> getValidMoves(Position pos, bool isPlayer); //get the valid moves from a position. Moving onto the player counts as a valid move, but not onto enemies
 	
 	Square* move(Entity* entity, Position pos); //move entity to pos, return the new square the entity is on. All moves MUST go through this function
 

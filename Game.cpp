@@ -136,20 +136,20 @@ vector<Enemy*> Board::populateBoard(int enemyCount) {
     return enemies;
 }
 
-vector<Direction> Board::getValidMoves(Position pos) {
+vector<Direction> Board::getValidMoves(Position pos, bool isPlayer) {
     vector<Direction> validDirections;
 
     //up
-    if (pos.row > 0            && getSquare(Position{pos.row-1, pos.col  })->isMoveValid(true))
+    if (pos.row > 0            && getSquare(Position{pos.row-1, pos.col  })->isMoveValid(isPlayer))
         validDirections.push_back(Direction::Up);
     //down
-    if (pos.row < BOARD_SIZE-1 && getSquare(Position{pos.row+1, pos.col  })->isMoveValid(true))
+    if (pos.row < BOARD_SIZE-1 && getSquare(Position{pos.row+1, pos.col  })->isMoveValid(isPlayer))
         validDirections.push_back(Direction::Down);
     //left
-    if (pos.col > 0            && getSquare(Position{pos.row  , pos.col-1})->isMoveValid(true))
+    if (pos.col > 0            && getSquare(Position{pos.row  , pos.col-1})->isMoveValid(isPlayer))
         validDirections.push_back(Direction::Left);
     //right
-    if (pos.col < BOARD_SIZE-1 && getSquare(Position{pos.row  , pos.col+1})->isMoveValid(true))
+    if (pos.col < BOARD_SIZE-1 && getSquare(Position{pos.row  , pos.col+1})->isMoveValid(isPlayer))
         validDirections.push_back(Direction::Right);
 
     return validDirections;
@@ -264,7 +264,7 @@ string Game::printState(string custom) {
     ss << "Points: " << player->getPoints() << endl;
 
     Position oldPos = player->getPosition();
-    vector<Direction> playerValidMoves = board->getValidMoves(oldPos);
+    vector<Direction> playerValidMoves = board->getValidMoves(oldPos, true);
 
     ss << validMovesString(playerValidMoves) << endl;
 
@@ -273,7 +273,7 @@ string Game::printState(string custom) {
 
 void Game::playerTurn() {
     Position oldPos = player->getPosition();
-    vector<Direction> playerValidMoves = board->getValidMoves(oldPos);
+    vector<Direction> playerValidMoves = board->getValidMoves(oldPos, true);
     Position newPos;
     int tolerance = 100;
     while (tolerance > 0) {
@@ -318,7 +318,7 @@ void Game::playerTurn() {
 void Game::enemiesTurn() {
     for (Enemy* enemy : enemies) {
         Position oldPos = enemy->getPosition();
-        vector<Direction> validMoves = board->getValidMoves(oldPos);
+        vector<Direction> validMoves = board->getValidMoves(oldPos, false);
 
         Position newPos = enemy->takeTurn(validMoves);
 
@@ -338,6 +338,7 @@ void Game::moveEntity(Entity* entity, Position newPos) {
 void Game::playerCollide(Enemy* enemy) {
 
     if (player->hasTreasure()) { //eat enemy
+
         auto it = find(enemies.begin(), enemies.end(), enemy);
         enemies.erase(it);
 
@@ -345,8 +346,8 @@ void Game::playerCollide(Enemy* enemy) {
 
         player->setTreasure(false);
 
-        delete enemy;
         statusDisplay = "You ate an enemy!";
+        cout << "3" << endl;
     } else { //take damage
         player->takeDamage();
         statusDisplay = "You took damage! You are now at " + to_string(player->getLives()) + " lives.";
