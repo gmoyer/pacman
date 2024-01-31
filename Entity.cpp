@@ -30,6 +30,13 @@ Player::Player() {
     points = 0;
 }
 
+void Player::addPoints(int p) {
+    points += p;
+}
+void Player::setTreasure(bool t) {
+    treasure = t;
+}
+
 bool Player::takeDamage() {
     lives -= 1;
     return lives == 0;
@@ -67,4 +74,22 @@ Position Player::takeTurn(vector<Direction> validDirections) {
 //================Enemy========================
 Enemy::Enemy(Position pos_) {
     pos = pos_;
+}
+
+
+Position Enemy::takeTurn(vector<Direction> validMoves) {
+    Direction chosenDirection = validMoves[rand() % validMoves.size()];
+
+    switch (chosenDirection) {
+        case Direction::Up:
+            return Position{pos.row-1, pos.col};
+        case Direction::Left:
+            return Position{pos.row, pos.col-1};
+        case Direction::Down:
+            return Position{pos.row+1, pos.col};
+        case Direction::Right:
+            return Position{pos.row, pos.col+1};
+        default:
+            return Position{0, 0};
+    }
 }

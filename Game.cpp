@@ -5,6 +5,9 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <chrono>
+#include <thread>
+#include <algorithm>
 
 using namespace std;
 
@@ -56,8 +59,12 @@ void Square::changeOccupant(Entity* entity) {
 }
 
 string Square::getStr() {
-    if (occupant != nullptr && occupant->getType() == EntityType::Player)
-        return "P";
+    if (occupant != nullptr && occupant->getType() == EntityType::Player) {
+        if (static_cast<Player*>(occupant)->hasTreasure())
+            return "O"; //like the player has their mouth open
+        else
+            return "P";
+    }
     if (occupant != nullptr && occupant->getType() == EntityType::Enemy)
         return "E";
 
@@ -190,7 +197,7 @@ Game::Game(string inputFile, const int enemyCount) {
 
 
 void Game::setup(string inputFile, const int enemyCount) {
-    turnCount = 1;
+    turnCount = 0;
     board = new Board(inputFile);
     statusDisplay = "";
 
@@ -205,8 +212,14 @@ void Game::startGame() {
     while (player->getLives() != 0 && enemies.size() != 0) {
         turnCount++;
         cout << printState(statusDisplay);
+        statusDisplay = "";
         playerTurn();
-        //moveEnemies();
+        enemiesTurn();
+
+        //check if there is a collision
+        Entity* occupant = board->getSquare(player->getPosition())->getOccupant();
+        if (occupant != nullptr && occupant->getType() == EntityType::Enemy)
+            playerCollide(static_cast<Enemy*>(occupant));
     }
 
     if (player->getLives() == 0) { //lose
@@ -244,9 +257,11 @@ string Game::validMovesString(vector<Direction> validDirections) {
 string Game::printState(string custom) {
     stringstream ss;
     ss << endl << endl << endl << endl << endl << endl;
-    ss << custom << endl << endl << endl << endl << endl; //seperate space
+    ss << endl << endl << endl << custom << endl << endl; //seperate space
     ss << "==================== Turn " << turnCount << " ====================" << endl;
     ss << board->printBoard() << endl;
+
+    ss << "Points: " << player->getPoints() << endl;
 
     Position oldPos = player->getPosition();
     vector<Direction> playerValidMoves = board->getValidMoves(oldPos);
@@ -276,13 +291,40 @@ void Game::playerTurn() {
     
     Entity* newOccupant = board->getSquare(newPos)->getOccupant();
 
-    if (newOccupant != nullptr && newOccupant->getType() == EntityType::Enemy) {
-        damagePlayer();
-        statusDisplay = "You took damage! You are now at " + to_string(player->getLives()) + " lives.";
-        return;
+    if (newOccupant != nullptr && newOccupant->getType() == EntityType::Enemy)
+            playerCollide(static_cast<Enemy*>(newOccupant));
+
+    //manage board state
+    switch (board->getSquare(newPos)->getType()) {
+        case SquareType::Dots:
+            player->addPoints(1);
+            board->getSquare(newPos)->changeType(SquareType::Empty);
+            break;
+        case SquareType::Treasure:
+            if (!player->hasTreasure()) {
+                player->setTreasure(true);
+                player->addPoints(100);
+                statusDisplay = "You collected a treasure! Now eat an enemy";
+                board->getSquare(newPos)->changeType(SquareType::Empty);
+            }
+            break;
+        default:
+            break;
     }
 
     moveEntity(player, newPos);
+}
+
+void Game::enemiesTurn() {
+    for (Enemy* enemy : enemies) {
+        Position oldPos = enemy->getPosition();
+        vector<Direction> validMoves = board->getValidMoves(oldPos);
+
+        Position newPos = enemy->takeTurn(validMoves);
+
+        moveEntity(enemy, newPos);
+
+    }
 }
 
 void Game::moveEntity(Entity* entity, Position newPos) {
@@ -293,10 +335,22 @@ void Game::moveEntity(Entity* entity, Position newPos) {
     board->getSquare(newPos)->changeOccupant(entity);
 }
 
-void Game::damagePlayer() {
-    player->takeDamage();
+void Game::playerCollide(Enemy* enemy) {
 
-    Position newPos = board->getRandomEmptySpace();
+    if (player->hasTreasure()) { //eat enemy
+        auto it = find(enemies.begin(), enemies.end(), enemy);
+        enemies.erase(it);
 
-    moveEntity(player, newPos);
+        board->getSquare(player->getPosition())->changeOccupant(player);
+
+        player->setTreasure(false);
+
+        delete enemy;
+        statusDisplay = "You ate an enemy!";
+    } else { //take damage
+        player->takeDamage();
+        statusDisplay = "You took damage! You are now at " + to_string(player->getLives()) + " lives.";
+        Position newPos = board->getRandomEmptySpace();
+        moveEntity(player, newPos);
+    }
 }

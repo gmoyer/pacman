@@ -27,9 +27,10 @@ public:
 
 	virtual EntityType getType() const { //must be implemented in subclasses
 		return EntityType::None; 
-	} 
+	}
 
 	void setPosition(Position p); //moves the entity to new position
+	virtual ~Entity() {}
 };
 
 class Player : public Entity {
@@ -48,6 +49,9 @@ public:
 	int getLives() { return lives; } //returns the lives of the player
 	int getPoints() { return points; } //return the number of points the player has
 	
+	void setTreasure(bool t); //sets treasure
+	void addPoints(int p); //adds p points
+
 	bool takeDamage(); //removes a player life, return true if player dies
 	
 	
@@ -64,7 +68,7 @@ public:
 		return EntityType::Enemy; 
 	} 
 	
-	//Position takeTurn(vector<Direction> validMoves); //use enemy AI to move enemy
+	Position takeTurn(vector<Direction> validMoves); //use enemy AI to move enemy
 
 };
 

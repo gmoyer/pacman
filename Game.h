@@ -55,10 +55,6 @@ public:
 	void parseBoard(); //loads the board into array
 	vector<Enemy*> populateBoard(int enemyCount); //populates the board with enemies and the same number of treasures. Returns the list of enemies
 
-	//SquareType getSquareType(Position pos); //returns the type of the square at a position
-	//void setSquareType(Position pos, SquareType type); //change the type of the square at a position
-	//Entity* getSquareOccupant(Position pos); //returns the occupant of the entity at a position
-
 	vector<Direction> getValidMoves(Position pos); //get the valid moves from a position. Moving onto the player counts as a valid move, but not onto enemies
 	
 	Square* move(Entity* entity, Position pos); //move entity to pos, return the new square the entity is on. All moves MUST go through this function
@@ -91,9 +87,9 @@ public:
 
 	void moveEntity(Entity *entity, Position newPos); //move entity to a new position
 
-	void damagePlayer(); //remove a player life and respawn player
+	void playerCollide(Enemy* enemy); //handle player collision
 
-	void moveEnemies(); //all enemy turn logic
+	void enemiesTurn(); //all enemy turn logic
 	
 	void gameOver(bool win); //ends the game, displays win or loss screen based on bool
 
