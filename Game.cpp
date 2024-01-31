@@ -249,6 +249,8 @@ string Game::validMovesString(vector<Direction> validDirections) {
             case Direction::Right:
                 ss << "Right (d)";
                 break;
+            default:
+                break;
         }
         if (i != validDirections.size() - 1)
             ss << ", ";
