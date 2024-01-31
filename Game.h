@@ -15,11 +15,11 @@ using namespace std;
 //forward declarations
 struct Position;
 class Entity; class Player; class Enemy;
+enum Direction; enum EntityType;
 
 
 //enums
 enum class SquareType { Wall, Dots, Treasure, Empty };
-enum class Direction { Up, Down, Left, Right };
 
 SquareType getSquareTypeFromChar(char c); //get the square time from a character
 
@@ -32,8 +32,9 @@ public:
 	Square(Position pos, SquareType type_); //initializes a square
 	Entity* getOccupant() const; //gets whoever is currently on the square (player/enemy)
 	SquareType getType() const; //gets the type of the square
-	char getChar(); //get what the square should display as
-	bool isMoveValid(); //returns if an entity can move here
+	string getStr(); //get what the square should display as
+	
+	bool isMoveValid(bool isPlayer); //returns if an entity can move here
 	bool isFillValid(); //returns if the square is open to be filled with enemy
 
 	void changeType(SquareType newType); //change the type of the square (ex. Dots -> Empty)
@@ -59,8 +60,7 @@ public:
 	//Entity* getSquareOccupant(Position pos); //returns the occupant of the entity at a position
 
 	vector<Direction> getValidMoves(Position pos); //get the valid moves from a position. Moving onto the player counts as a valid move, but not onto enemies
-	string getValidMovesString(Position pos); //get the valid moves but as a string
-
+	
 	Square* move(Entity* entity, Position pos); //move entity to pos, return the new square the entity is on. All moves MUST go through this function
 
 	string printBoard(); //prints the entire board
@@ -72,6 +72,7 @@ private:
 	Player* player;
 	vector<Enemy*> enemies;
 	int turnCount;
+	string statusDisplay;
 public:
 	Game(); //creates a new game with 5 enemies and default board board.txt
 	Game(string inputFile); //creates a new game with 5 enemies and custom board
@@ -82,10 +83,18 @@ public:
 
 	void startGame(); //cycles taking turns until game over
 
-	void takeTurn(); //turn logic, performs player move and then performs enemy moves
+	string validMovesString(vector<Direction> validDirections); //get the valid moves but as a string
+	
+	string printState(string custom); //print the current game state
 
-	void killEnemy(Enemy* enemy); //delete enemy, remove its address from enemies array
+	void playerTurn(); //player turn logic
 
+	void moveEntity(Entity *entity, Position newPos); //move entity to a new position
+
+	void damagePlayer(); //remove a player life and respawn player
+
+	void moveEnemies(); //all enemy turn logic
+	
 	void gameOver(bool win); //ends the game, displays win or loss screen based on bool
 
 	~Game(); //clean up memory

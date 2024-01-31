@@ -3,9 +3,11 @@
 
 
 #include <string>
+#include <vector>
 using namespace std;
 
 enum class EntityType { Player, Enemy, None };
+enum class Direction { Up, Down, Left, Right };
 
 struct Position {
 	int row;
@@ -23,15 +25,11 @@ public:
 
 	Position getPosition() const {return pos; }  // returns the position of the entity
 
-	bool collidesWith(Entity* other); //checks if the entity collides with another
-
-	//Position moveRelative(Direction direction); //move the entity in the relative direction.
-
-	Position moveAbsolute(Position pos); //teleport the entity to a position.
-
 	virtual EntityType getType() const { //must be implemented in subclasses
 		return EntityType::None; 
 	} 
+
+	void setPosition(Position p); //moves the entity to new position
 };
 
 class Player : public Entity {
@@ -49,10 +47,12 @@ public:
 	bool hasTreasure() {return treasure; } //returns if the player currently has a treasure or not
 	int getLives() { return lives; } //returns the lives of the player
 	int getPoints() { return points; } //return the number of points the player has
+	
+	bool takeDamage(); //removes a player life, return true if player dies
+	
+	
+	Position takeTurn(vector<Direction> validDirections); //requests player input, and moves accordingly
 
-	void takeTurn(); //requests player input, and moves accordingly
-
-	void takeDamage(); //removes a player life, and randomly respawns the player
 };
 class Enemy : public Entity {
 private:
