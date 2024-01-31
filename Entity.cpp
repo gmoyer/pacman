@@ -77,10 +77,36 @@ Enemy::Enemy(Position pos_) {
 }
 
 
-Position Enemy::takeTurn(vector<Direction> validMoves) {
+Position Enemy::takeTurn(vector<Direction> validMoves, Position playerPos) {
+    vector<Direction> v = validMoves;
     Direction chosenDirection = Direction::None;
-    if (validMoves.size() > 0)
+
+    //don't move if no valid directions
+    if (validMoves.size() > 0) {
+
+        //first choose a random directions
         chosenDirection = validMoves[rand() % validMoves.size()];
+
+        //simple tracking AI
+        if (pos.row == playerPos.row) {
+            if (pos.col > playerPos.col && 
+                (find(v.begin(), v.end(), Direction::Left) != v.end())) //only track if it is a valid option
+                chosenDirection = Direction::Left;
+            else if (
+                (find(v.begin(), v.end(), Direction::Right) != v.end()))
+                chosenDirection = Direction::Right;
+        }
+        if (pos.col == playerPos.col) {
+            if (pos.row > playerPos.row && 
+                (find(v.begin(), v.end(), Direction::Up) != v.end()))
+                chosenDirection = Direction::Up;
+            else if (
+                (find(v.begin(), v.end(), Direction::Down) != v.end()))
+                chosenDirection = Direction::Down;
+        }
+    }
+        
+    
     switch (chosenDirection) {
         case Direction::Up:
             return Position{pos.row-1, pos.col};

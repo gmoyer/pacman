@@ -68,7 +68,7 @@ public:
 		return EntityType::Enemy; 
 	} 
 	
-	Position takeTurn(vector<Direction> validMoves); //use enemy AI to move enemy
+	Position takeTurn(vector<Direction> validMoves, Position playerPos); //use enemy AI to move enemy
 
 };
 

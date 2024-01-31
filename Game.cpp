@@ -321,7 +321,7 @@ void Game::enemiesTurn() {
     for (Enemy* enemy : enemies) {
         Position oldPos = enemy->getPosition();
         vector<Direction> validMoves = board->getValidMoves(oldPos, false);
-        Position newPos = enemy->takeTurn(validMoves);
+        Position newPos = enemy->takeTurn(validMoves, player->getPosition());
         moveEntity(enemy, newPos);
     }
 }
