@@ -77,7 +77,7 @@ Enemy::Enemy(Position pos_) {
 }
 
 
-Position Enemy::takeTurn(vector<Direction> validMoves, Position playerPos) {
+Position Enemy::takeTurn(vector<Direction> validMoves, Position playerPos, bool hasTreasure) {
     vector<Direction> v = validMoves;
     Direction chosenDirection = Direction::None;
 
@@ -88,8 +88,14 @@ Position Enemy::takeTurn(vector<Direction> validMoves, Position playerPos) {
         chosenDirection = validMoves[rand() % validMoves.size()];
 
         //simple tracking AI
+        int rowComp = pos.row - playerPos.row;
+        int colComp = pos.col - playerPos.col;
+        if (hasTreasure) {
+            rowComp = -rowComp;
+            colComp = -colComp;
+        }
         if (pos.row == playerPos.row) {
-            if (pos.col > playerPos.col && 
+            if (colComp > 0 && 
                 (find(v.begin(), v.end(), Direction::Left) != v.end())) //only track if it is a valid option
                 chosenDirection = Direction::Left;
             else if (
@@ -97,7 +103,7 @@ Position Enemy::takeTurn(vector<Direction> validMoves, Position playerPos) {
                 chosenDirection = Direction::Right;
         }
         if (pos.col == playerPos.col) {
-            if (pos.row > playerPos.row && 
+            if (rowComp > 0 && 
                 (find(v.begin(), v.end(), Direction::Up) != v.end()))
                 chosenDirection = Direction::Up;
             else if (
