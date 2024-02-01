@@ -214,14 +214,7 @@ void Game::startGame() {
         cout << printState(statusDisplay);
         statusDisplay = "";
         playerTurn();
-        cout << "a" << endl;
         enemiesTurn();
-        cout << "b" << endl;
-        //check if there is a collision
-        Entity* occupant = board->getSquare(player->getPosition())->getOccupant();
-        if (occupant != nullptr && occupant->getType() == EntityType::Enemy)
-            playerCollide(static_cast<Enemy*>(occupant));
-        cout << "c" << endl;
     }
 
     if (player->getLives() == 0) { //lose
@@ -290,9 +283,6 @@ void Game::playerTurn() {
         tolerance--;
     }
     
-
-    //display new turn after player input
-    
     Entity* newOccupant = board->getSquare(newPos)->getOccupant();
 
     if (newOccupant != nullptr && newOccupant->getType() == EntityType::Enemy)
@@ -324,6 +314,12 @@ void Game::enemiesTurn() {
         Position oldPos = enemy->getPosition();
         vector<Direction> validMoves = board->getValidMoves(oldPos, false);
         Position newPos = enemy->takeTurn(validMoves, player->getPosition(), player->hasTreasure());
+        
+        Entity* newOccupant = board->getSquare(newPos)->getOccupant();
+
+        if (newOccupant != nullptr && newOccupant->getType() == EntityType::Player)
+            playerCollide(enemy);
+        
         moveEntity(enemy, newPos);
     }
 }
